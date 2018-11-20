@@ -17,9 +17,10 @@ function noAds(page) {
     switch(page) {
         case 'single':
             jQuery('.well').eq(0).find('table > tbody > tr:last').remove();
+            jQuery('ins').remove();
             break;
         case 'search':
-            jQuery('#result-main-right').remove();
+            jQuery('#result-main-right, ins').remove();
             break;
         case 'home':
             jQuery('ins').remove();
@@ -59,13 +60,13 @@ function ajaxCall(obj) {
     }).done(function(data) {
         //-- Decode and store URL
         const url = urlRevealer(data)
-        
+
         //-- Add URL to hash object for use now, and possibly later if we want
         Object.assign(obj, {url: `${url}`});
-        
+
         //-- Get the correct download button to replace href for
         const dlBtn = jQuery('.dn-btn > a').eq([obj.btnNum] - 1);
-        
+
         //-- Replace download button href with correct URL from hash object
         dlBtn.attr('href', obj.url);
     }).fail(function(data) {
@@ -100,10 +101,10 @@ function singleResult() {
         jQuery("[title='Download now']").each(function() {
             //-- Get the filename
             let fn = jQuery(this).parent().siblings().eq(0).text().trim()
-            
+
             //-- Append filename to decoded URL
             fn = decodedStr + fn
-            
+
             //-- Replace button and link hrefs with our constructed URL
             jQuery(this).attr('href', fn);
             jQuery(this).parent().siblings().eq(0).find('a').attr('href', fn);
@@ -121,7 +122,7 @@ function singleResult() {
 function searchResults(files) {
     //-- Kill ads
     noAds('search');
-    
+
     //-- Correct width of search results container:
     jQuery('#result-main-center').css('width', '100%');
 
@@ -133,13 +134,13 @@ function searchResults(files) {
     //-- Below, get array of hashes from download buttons on page
     //-- and add key/value pair to keep track of which URL belongs
     //-- to which button since AJAX calls happen asyncronously
-    
+
     //-- Create empty array to store hash objects
     let hashArr = []
-    
+
     //-- Find all download buttons on the page
     const hashFind = jQuery('.dn-btn > a')
-    
+
     //-- Create variable to store button count
     let btnCount = 0
 
@@ -148,23 +149,23 @@ function searchResults(files) {
     hashFind.each(function () {
         //-- Increase button count
         btnCount++
-        
+
         //-- Get hash object from button href
         let hash = jQuery(this).attr('href')
-        
+
         //-- Find start/end position of object brackets
         const start = hash.indexOf("{")
         const end = hash.indexOf("}")
-        
+
         //-- Part out hash object from the rest of the element
         hash = hash.slice(start, end+1)
-        
+
         //-- Replace key/value single quotes with double quotes
         hash = JSON.parse(hash.replace(/'/g, '"'))
-        
+
         //-- Add button count key/value to hash object for AJAX call
         Object.assign(hash, {btnNum: btnCount});
-        
+
         //-- Add hash object to the hash array
         hashArr.push(hash);
     });
