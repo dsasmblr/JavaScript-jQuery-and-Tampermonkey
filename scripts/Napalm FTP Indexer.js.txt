@@ -72,10 +72,10 @@ function singleResult() {
     noAds('single');
 
     //-- Get full contents of <script>
-    const data = jQuery('script');
+    const data = jQuery('script')
 
     //-- Call to get decoded url string
-    const decodedStr = urlRevealer(data);
+    const decodedStr = urlRevealer(data)
 
     //-- Populate URL text boxes
     jQuery('#content1, #content3').html(decodedStr);
@@ -90,7 +90,7 @@ function singleResult() {
     //-- If only one file result, adjust accordingly
     if (jQuery('.file').length > 1) {
         jQuery("[title='Download now']").each(function() {
-            let fn = jQuery(this).parent().siblings().eq(0).text().trim();
+            let fn = jQuery(this).parent().siblings().eq(0).text().trim()
             fn = decodedStr + fn
             jQuery(this).attr('href', fn);
             jQuery(this).parent().siblings().eq(0).find('a').attr('href', fn);
@@ -117,19 +117,19 @@ function searchResults(files) {
     //-- Add key/value pair to keep track of which URL belongs
     //-- to which button since AJAX calls happen asyncronously
     let hashArr = []
-    let hashFind = jQuery('.dn-btn > a');
+    const hashFind = jQuery('.dn-btn > a')
     let btnCount = 0
 
-    hashFind.each(function() {
+    hashFind.each(function () {
         btnCount++
-        let hash = jQuery(this).attr('href');
+        let hash = jQuery(this).attr('href')
         const start = hash.indexOf("{")
         const end = hash.indexOf("}")
         hash = hash.slice(start, end+1)
         hash = JSON.parse(hash.replace(/'/g, '"'))
         Object.assign(hash, {btnNum: btnCount});
         hashArr.push(hash);
-    })
+    });
 
     //-- Loop through hash array to get URLs for download buttons
     for (let i = 0; i < hashArr.length; i++) {
@@ -153,7 +153,7 @@ function start() {
             //-- Search results page with results
             searchResults('yesFiles');
         } else if (jQuery('.alert.alert-block') > 0) {
-            //-- Search results page with results
+            //-- Search results page with no results
             searchResults('noFiles');
         } else {
             //-- Home page
