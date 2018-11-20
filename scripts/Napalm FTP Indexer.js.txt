@@ -1,0 +1,166 @@
+// ==UserScript==
+// @name         Napalm FTP Indexer
+// @namespace    https://www.searchftps.net/
+// @version      1
+// @description  Kills ads, makes buttons function as expected, etc.
+// @author       Stephen Chapman
+// @match        *://*.searchftps.net/*
+// @run-at       document-idle
+// @grant        none
+// ==/UserScript==
+
+//-- Eliminate Tampermonkey warnings about not recognizing jQuery
+var jQuery = window.jQuery;
+
+//-- Get rid of ad containers for each page as appropriately passed
+function noAds(page) {
+    switch(page) {
+        case 'single':
+            jQuery('.well').eq(0).find('table > tbody > tr:last').remove();
+            break;
+        case 'search':
+            jQuery('#result-main-right').remove();
+            break;
+        case 'home':
+            jQuery('ins').remove();
+            break;
+        default:
+            break;
+    }
+}
+
+//-- Decode URL
+function urlRevealer(data) {
+    //-- Find beginning of first instance of decode()
+    const start = jQuery(data).text().indexOf("decode('");
+
+    //-- Find end of first instance of decode()
+    const end = jQuery(data).text().indexOf(")));");
+
+    //-- Build the string to be decoded; clean up with trim()
+    const encodedStr = jQuery(data).text().substr(start + 8, (end - start)).replace("')));", "").trim();
+
+    //-- Decode and return the string (should be the URL)
+    //-- Using native JS base64 decode function atob() instead of site's custom decode()
+    return atob(encodedStr);
+}
+
+//-- AJAX call to get file download URLs from individual results pages
+function ajaxCall(obj) {
+    //-- Prepare serialized data to be sent
+    let str = JSON.stringify(obj.hash).replace(/"/g, '')
+    str = `action=content&args=type%3Df%26hash%3D${str}`
+
+    //-- Perform AJAX post call, and when finished, update download buttons with direct file URL
+    jQuery.ajax({
+        type: 'post',
+        url: '/',
+        data: str,
+    }).done(function(data) {
+        const url = urlRevealer(data)
+        Object.assign(obj, {url: `${url}`});
+        const dlBtn = jQuery('.dn-btn > a').eq([obj.btnNum] - 1);
+        dlBtn.attr('href', obj.url);
+    }).fail(function(data) {
+        console.log("Failed: " + obj)
+    });
+};
+
+//-- Single file(s) page
+function singleResult() {
+    //-- Kill ads
+    noAds('single');
+
+    //-- Get full contents of <script>
+    const data = jQuery('script');
+
+    //-- Call to get decoded url string
+    const decodedStr = urlRevealer(data);
+
+    //-- Populate URL text boxes
+    jQuery('#content1, #content3').html(decodedStr);
+
+    //-- Reconstruct "Direct Link" button
+    jQuery('#content1_a').attr('href', decodedStr);
+
+    //-- Reconstruct "Copy to Clipboard" buttons
+    jQuery('#copy-ftp-url, #copy-ftp-url-unencoded').attr('data-clipboard-text', decodedStr);
+
+    //-- Reconstruct DOWNLOAD buttons and hyperlinked filenames
+    //-- If only one file result, adjust accordingly
+    if (jQuery('.file').length > 1) {
+        jQuery("[title='Download now']").each(function() {
+            let fn = jQuery(this).parent().siblings().eq(0).text().trim();
+            fn = decodedStr + fn
+            jQuery(this).attr('href', fn);
+            jQuery(this).parent().siblings().eq(0).find('a').attr('href', fn);
+        })
+    } else {
+        jQuery('.file > a').attr('href', decodedStr);
+    }
+
+    //-- Show and re-link "Directory" hyperlink
+    jQuery('.dir > b > a').text(decodedStr).attr('href', decodedStr);
+}
+
+//-- Search results pages (with or without results)
+function searchResults(files) {
+    //-- Kill ads
+    noAds('search');
+
+    //-- If no search results on page, return
+    if (files == 'noFiles') {
+        return;
+    }
+
+    //-- Get array of hashes from download buttons on page
+    //-- Add key/value pair to keep track of which URL belongs
+    //-- to which button since AJAX calls happen asyncronously
+    let hashArr = []
+    let hashFind = jQuery('.dn-btn > a');
+    let btnCount = 0
+
+    hashFind.each(function() {
+        btnCount++
+        let hash = jQuery(this).attr('href');
+        const start = hash.indexOf("{")
+        const end = hash.indexOf("}")
+        hash = hash.slice(start, end+1)
+        hash = JSON.parse(hash.replace(/'/g, '"'))
+        Object.assign(hash, {btnNum: btnCount});
+        hashArr.push(hash);
+    })
+
+    //-- Loop through hash array to get URLs for download buttons
+    for (let i = 0; i < hashArr.length; i++) {
+        ajaxCall(hashArr[i])
+    }
+}
+
+//-- Home page (just kills ads for now)
+function homePage() {
+    //-- Kill ads
+    noAds('home');
+}
+
+//-- A half a second after the page is idle, check to see which page is loaded
+function start() {
+    setTimeout(function () {
+        if (jQuery('.well').length > 0) {
+            //-- Specific file(s) result page
+            singleResult();
+        } else if (jQuery('.similar').length > 0) {
+            //-- Search results page with results
+            searchResults('yesFiles');
+        } else if (jQuery('.alert.alert-block') > 0) {
+            //-- Search results page with results
+            searchResults('noFiles');
+        } else {
+            //-- Home page
+            homePage();
+        }
+    }, 500);
+}
+
+//-- Shall we begin? =)
+start();
