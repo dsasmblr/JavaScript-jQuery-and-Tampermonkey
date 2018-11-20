@@ -121,6 +121,9 @@ function singleResult() {
 function searchResults(files) {
     //-- Kill ads
     noAds('search');
+    
+    //-- Correct width of search results container:
+    jQuery('#result-main-center').css('width', '100%');
 
     //-- If no search results on page, return
     if (files == 'noFiles') {
