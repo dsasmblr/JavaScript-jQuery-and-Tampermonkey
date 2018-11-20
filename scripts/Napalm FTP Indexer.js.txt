@@ -62,9 +62,9 @@ function ajaxCall(obj) {
         const dlBtn = jQuery('.dn-btn > a').eq([obj.btnNum] - 1);
         dlBtn.attr('href', obj.url);
     }).fail(function(data) {
-        console.log("Failed: " + obj)
+        console.log("Failed: " + obj);
     });
-};
+}
 
 //-- Single file(s) page
 function singleResult() {
@@ -133,7 +133,7 @@ function searchResults(files) {
 
     //-- Loop through hash array to get URLs for download buttons
     for (let i = 0; i < hashArr.length; i++) {
-        ajaxCall(hashArr[i])
+        ajaxCall(hashArr[i]);
     }
 }
 
