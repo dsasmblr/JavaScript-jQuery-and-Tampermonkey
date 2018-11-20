@@ -57,11 +57,19 @@ function ajaxCall(obj) {
         url: '/',
         data: str,
     }).done(function(data) {
+        //-- Decode and store URL
         const url = urlRevealer(data)
+        
+        //-- Add URL to hash object for use now, and possibly later if we want
         Object.assign(obj, {url: `${url}`});
+        
+        //-- Get the correct download button to replace href for
         const dlBtn = jQuery('.dn-btn > a').eq([obj.btnNum] - 1);
+        
+        //-- Replace download button href with correct URL from hash object
         dlBtn.attr('href', obj.url);
     }).fail(function(data) {
+        //-- Log to the console if there was a failure
         console.log("Failed: " + obj);
     });
 }
@@ -90,12 +98,18 @@ function singleResult() {
     //-- If only one file result, adjust accordingly
     if (jQuery('.file').length > 1) {
         jQuery("[title='Download now']").each(function() {
+            //-- Get the filename
             let fn = jQuery(this).parent().siblings().eq(0).text().trim()
+            
+            //-- Append filename to decoded URL
             fn = decodedStr + fn
+            
+            //-- Replace button and link hrefs with our constructed URL
             jQuery(this).attr('href', fn);
             jQuery(this).parent().siblings().eq(0).find('a').attr('href', fn);
         })
     } else {
+        //-- Replace file link href with our constructed URL
         jQuery('.file > a').attr('href', decodedStr);
     }
 
@@ -113,25 +127,46 @@ function searchResults(files) {
         return;
     }
 
-    //-- Get array of hashes from download buttons on page
-    //-- Add key/value pair to keep track of which URL belongs
+    //-- Below, get array of hashes from download buttons on page
+    //-- and add key/value pair to keep track of which URL belongs
     //-- to which button since AJAX calls happen asyncronously
+    
+    //-- Create empty array to store hash objects
     let hashArr = []
+    
+    //-- Find all download buttons on the page
     const hashFind = jQuery('.dn-btn > a')
+    
+    //-- Create variable to store button count
     let btnCount = 0
 
+    //-- Loop through collection of download buttons, and
+    //-- for each one, do stuff
     hashFind.each(function () {
+        //-- Increase button count
         btnCount++
+        
+        //-- Get hash object from button href
         let hash = jQuery(this).attr('href')
+        
+        //-- Find start/end position of object brackets
         const start = hash.indexOf("{")
         const end = hash.indexOf("}")
+        
+        //-- Part out hash object from the rest of the element
         hash = hash.slice(start, end+1)
+        
+        //-- Replace key/value single quotes with double quotes
         hash = JSON.parse(hash.replace(/'/g, '"'))
+        
+        //-- Add button count key/value to hash object for AJAX call
         Object.assign(hash, {btnNum: btnCount});
+        
+        //-- Add hash object to the hash array
         hashArr.push(hash);
     });
 
-    //-- Loop through hash array to get URLs for download buttons
+    //-- Loop through hash array and make AJAX calls accordingly
     for (let i = 0; i < hashArr.length; i++) {
         ajaxCall(hashArr[i]);
     }
