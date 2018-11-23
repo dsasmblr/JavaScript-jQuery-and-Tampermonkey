@@ -182,24 +182,25 @@ function homePage() {
     noAds('home');
 }
 
-//-- A half a second after the page is idle, check to see which page is loaded
+//-- Check to see which page is loaded
 function start() {
-    setTimeout(function () {
-        if (jQuery('.well').length > 0) {
-            //-- Specific file(s) result page
-            singleResult();
-        } else if (jQuery('.similar').length > 0) {
-            //-- Search results page with results
-            searchResults('yesFiles');
-        } else if (jQuery('.alert.alert-block') > 0) {
-            //-- Search results page with no results
-            searchResults('noFiles');
-        } else {
-            //-- Home page
-            homePage();
-        }
-    }, 500);
+    if (jQuery('.well').length > 0) {
+        //-- Specific file(s) result page
+        singleResult();
+    } else if (jQuery('.similar').length > 0) {
+        //-- Search results page with results
+        searchResults('yesFiles');
+    } else if (jQuery('.alert.alert-block') > 0) {
+        //-- Search results page with no results
+        searchResults('noFiles');
+    } else {
+        //-- Home page
+        homePage();
+    }
 }
 
-//-- Shall we begin? =)
-start();
+//-- Once the document state is idle (as defined by @run-at in
+//-- the header section of this script), wait half a second to start
+setTimeout(function () {
+    start();
+}, 500);
