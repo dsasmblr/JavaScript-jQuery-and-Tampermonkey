@@ -97,9 +97,6 @@ function createDeleteButtons() {
         //-- Add delete button to the page before each Star button
         starBtn.parentNode.parentNode.parentNode.insertAdjacentHTML('afterbegin', delBtn);
 
-        //-- Add title to clickObj for trackable clicks
-        clickObj[repoNames[arrayCount].innerText] = 0;
-
         arrayCount++;
     }
 
