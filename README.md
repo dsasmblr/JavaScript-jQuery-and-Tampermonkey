@@ -1,7 +1,7 @@
 # JavaScript, jQuery, and Tampermonkey Scripts
 These are various scripts I've written for personal use, demonstration purposes (i.e. via my YouTube channel), friends, etc. Brief descriptions for each can be found below.
 
-**Fast GitHub Repo Delete.js** - ***(JavaScript)*** | *A work-in-progress script that currently adds a delete button to a user's GitHub repositories main page, then fast-deletes any given repo after its delete button has been clicked 5 times! Great for use via Tampermonkey, or can be ran from the console while on the repositories page.*
+**[Fast GitHub Repo Delete.js](https://github.com/dsasmblr/JavaScript-jQuery-and-Tampermonkey/blob/master/scripts/Fast%20GitHub%20Repo%20Delete.js)** - ***(JavaScript)*** | *A work-in-progress script that currently adds a delete button to a user's GitHub repositories main page, then fast-deletes any given repo after its delete button has been clicked 5 times! Great for use via Tampermonkey, or can be ran from the console while on the repositories page.*
 
 **Napalm FTP Indexer.js** - ***(jQuery / Tampermonkey)*** | *This is an extensive script that modifies searchftps.net to do a number of things, including remove ads, make requests to the server with hash information to obtain links with which I repurpose download buttons on search results pages, and more!*
 
