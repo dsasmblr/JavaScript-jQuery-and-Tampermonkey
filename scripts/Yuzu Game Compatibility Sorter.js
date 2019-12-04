@@ -22,9 +22,9 @@ function sort(data) {
     const compatibility = parseInt(game.childNodes[3].getAttribute('data-compatibility'));
 
     if (data === 'reset' || data === compatibility) {
-	  game.style.display = 'table-row';
+      game.style.display = 'table-row';
     } else {
-	  game.style.display = 'none';
+      game.style.display = 'none';
     }
   }
 }
