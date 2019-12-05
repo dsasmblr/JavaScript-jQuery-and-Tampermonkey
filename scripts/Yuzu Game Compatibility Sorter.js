@@ -10,7 +10,7 @@
 // time you load the page, or paste it all into your browser's DevTools console and then
 // press Enter to execute the code!
 
-// Get all rows of games from the tame table
+// Get all rows of games from the game table
 const allGames = [...document.querySelectorAll('[data-key]')];
 
 // Get all rows from the "Game Compatibility List" table
